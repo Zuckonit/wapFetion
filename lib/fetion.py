@@ -36,8 +36,8 @@ _accout  = desetting.get_account()
 username = _accout[0]
 password = _accout[1]
 #{{test code
-#print username
-#print password
+print username
+print password
 #}}
 #}}}
 
@@ -96,17 +96,23 @@ class FetionSetBirthdayRemindFailed(Error):
 
 
 #{{{Feedback information
+feedback_login_ing       = '''您正在登录中国移动WAP飞信,请稍候'''
 feedback_login_fail      = '''自动返回输入登录页面'''
 feedback_not_find_userId = '''没有符合条件的好友'''
 feedback_not_your_friend = '''没有找到你要查找的好友'''
 feedback_already_friend  = '''该用户已经是您的好友'''
 feedback_sure_friend     = '''发送成功!待对方同意后,TA就是您的好友啦'''
 feedback_birth_remind_success  = '''生日短信提醒设置成功'''
+feedback_verify_code     = '''图形验证码错误'''
 #}}}
 
 #============================= parse ============================#
 
-
+#img src="/im/systemimage/verifycode1347069516764.jpeg"
+#<img src="/im/systemimage/verifycode1347071510224.jpeg"
+#parse_verify_code = re.compile(r'img src="/im/systemimage/verifycode(.*?).jpeg')
+#name="captchaCode" value="$(captchaCode1347071510224)"
+parse_verify_code = re.compile(r'<img src=.*?verifycode(.*?).jpeg')
 parse_csrf_token  = re.compile(r'name="csrfToken" value="(.*?)"')
 parse_user_id     = re.compile(r'touserid=(\d*)')
 parse_group_id    = re.compile(r'idContactList=(.*?)&')
@@ -155,25 +161,28 @@ class Fetion(object):
         req  = urllib2.Request(url,urllib.urlencode(data))
         html = self.opener.open(req).read()
         #print html
-        if feedback_login_fail in html:
-            raise FetionLoginFailed
-        else:
-            return html
+        #if feedback_login_fail in html:
+            #raise FetionLoginFailed
+        #else:
+        return html
 
 
     def login(self):
-        """
-        login
-        """
-
-        print urls.URL['url_login']
-        try:
-            self.open(urls.URL['url_login'],{\
-                        'pass':self.pwd,\
-                        'loginstatus':self.login_status,\
-                        'm':self.usr})
-        except:
-            raise FetionLoginFailed
+        htm = ''
+        data = {
+            'm': self.usr,
+            'pass': self.pwd,
+        }
+        while '图形验证码错误' in htm or not htm:
+            page = self.open('http://f.10086.cn/im5/login/loginHtml5.action')
+            captcha = parse_verify_code.findall(page)[0]
+            img = self.open('http://f.10086.cn/im5/systemimage/verifycode%s.jpeg' % captcha)
+            open('verifycode.jpeg', 'wb').write(img)
+            captchacode = raw_input('captchaCode:')
+            data['captchaCode'] = captchacode
+            htm = self.open('http://f.10086.cn/im5/login/loginHtml5.action', data)
+        #self.alive()
+        return '登录' in htm
 
 
     def logout(self):

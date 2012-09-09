@@ -2,12 +2,13 @@
 #-*- coding:utf-8 -*-
 import urllib
 
-
+#http://f.10086.cn/im/login/inputpass.action
 base = 'http://f.10086.cn/im/'
-wrap = lambda mid,trail,getdata='':base + mid + trail + urllib.urlencode(getdata)
+wrap = lambda mid,trail,getdata='':base + mid + '/' + trail + urllib.urlencode(getdata)
 URL = {
     #login
     'url_login' : wrap('login','inputpasssubmit1.action'),
+    'url_verify': wrap('login','inputpass.action'),
     #'url_login' : wrap('login','login.action'),
 
     #index
