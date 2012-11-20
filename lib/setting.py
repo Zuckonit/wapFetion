@@ -50,8 +50,8 @@ INTERVAL = '|~slash~|'        #this will be used when ENGINE is txt.txt
 
 
 ACCOUNT = {
-    'username':'15280991357',                  #your fetion username
-    'password':'yang3136299.cn'                   #your fetion password
+    'username':'',                  #your fetion username
+    'password':''                   #your fetion password
 }
 
 
